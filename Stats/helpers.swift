@@ -160,20 +160,9 @@ extension AppDelegate {
     }
     
     internal func setup(completion: @escaping () -> Void) {
-        if Store.shared.exist(key: "setupProcess") || Store.shared.exist(key: "runAtLoginInitialized") {
-            completion()
-            return
-        }
-        
-        debug("showing the setup window")
-        
-        let window = self.ensureSetupWindow()
-        window.show()
-        window.finishHandler = {
-            debug("setup is finished, starting the app")
-            completion()
-        }
-        Store.shared.set(key: "setupProcess", value: true)
+        // The custom build has one Network module with its focused widgets on by
+        // default, so the original multi-module onboarding flow is unnecessary.
+        completion()
     }
     
     internal func checkForNewVersion(silent: Bool = false) {

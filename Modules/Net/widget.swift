@@ -61,10 +61,10 @@ public struct Provider: TimelineProvider {
 @available(macOS 14.0, *)
 public struct NetworkWidget: Widget {
     private var base: DataSizeBase {
-        DataSizeBase(rawValue: Store.shared.string(key: "\(ModuleType.network.stringValue)_base", defaultValue: DataSizeBase.byte.rawValue)) ?? .byte
+        .byte
     }
     private var speedUnit: String {
-        networkSpeedUnit(from: Store.shared.string(key: "\(ModuleType.network.stringValue)_speedUnit", defaultValue: NetworkSpeedUnitAuto)).key
+        SizeUnit.MB.key
     }
 
     public init() {}

@@ -27,6 +27,9 @@ internal class Popup: PopupWrapper {
     private var downloadValueField: NSTextField? = nil
     private var downloadUnitField: NSTextField? = nil
     private var downloadStateView: ColorView? = nil
+
+    private var qualityColorView: ColorBlock? = nil
+    private var qualityField: ValueField? = nil
     
     private var downloadColorView: NSView? = nil
     private var uploadColorView: NSView? = nil
@@ -88,10 +91,10 @@ internal class Popup: PopupWrapper {
     private var jitter: [Double] = []
     
     private var base: DataSizeBase {
-        DataSizeBase(rawValue: Store.shared.string(key: "\(self.title)_base", defaultValue: "byte")) ?? .byte
+        .byte
     }
     private var speedUnit: String {
-        networkSpeedUnit(from: Store.shared.string(key: "\(self.title)_speedUnit", defaultValue: NetworkSpeedUnitAuto)).key
+        SizeUnit.MB.key
     }
     private var numberOfProcesses: Int {
         Store.shared.int(key: "\(self.title)_processes", defaultValue: 8)
@@ -135,16 +138,7 @@ internal class Popup: PopupWrapper {
         self.emojiCCState = Store.shared.bool(key: "\(self.title)_emojiCC", defaultValue: self.emojiCCState)
         
         self.addArrangedSubview(self.initDashboard())
-        self.addArrangedSubview(self.initChart())
-        self.addArrangedSubview(self.initConnectivityChart())
-        self.addArrangedSubview(self.initDetails())
-        self.addArrangedSubview(self.initInterface())
-        self.addArrangedSubview(self.initAddress())
-        self.addArrangedSubview(self.initProcesses())
-        
-        if !self.publicIPState {
-            self.addressView?.removeFromSuperview()
-        }
+        self.addArrangedSubview(self.initQuality())
         
         self.recalculateHeight()
         
@@ -201,7 +195,24 @@ internal class Popup: PopupWrapper {
         
         return view
     }
-    
+
+    private func initQuality() -> NSView {
+        let view = NSStackView(frame: NSRect(x: 0, y: 0, width: self.frame.width, height: 0))
+        view.orientation = .vertical
+        view.spacing = 0
+
+        let quality = popupWithColorRow(
+            view,
+            color: .systemGray,
+            title: "Wi-Fi quality:",
+            value: "Checking…"
+        )
+        self.qualityColorView = quality.0
+        self.qualityField = quality.2
+
+        return view
+    }
+
     private func initChart() -> NSView {
         let view: NSView = NSView(frame: NSRect(x: 0, y: 0, width: self.frame.width, height: 90 + Constants.Popup.separatorHeight))
         view.heightAnchor.constraint(equalToConstant: view.bounds.height).isActive = true
@@ -610,22 +621,17 @@ internal class Popup: PopupWrapper {
     }
     
     private func renderConnectivity(_ value: Network_Connectivity?) {
-        var latency = localizedString("Unknown")
-        var jitter = localizedString("Unknown")
-        
-        if let v = value {
-            if v.status && !self.latency.isEmpty {
-                latency = "\((self.latency.reduce(0, +) / Double(self.latency.count)).rounded(toPlaces: 2)) ms"
-            }
-            if v.status && !self.jitter.isEmpty {
-                jitter = "\((self.jitter.reduce(0, +) / Double(self.jitter.count)).rounded(toPlaces: 2)) ms"
-            }
+        guard let value else {
+            self.qualityColorView?.set(color: .systemGray)
+            self.qualityField?.stringValue = "Checking…"
+            return
         }
-        self.latencyField?.stringValue = latency
-        self.jitterField?.stringValue = jitter
         
-        self.connectivityField?.setStatus(value?.status)
-        self.connectivityChart?.display()
+        let quality = NetworkQuality(value)
+        self.qualityColorView?.set(color: quality.color)
+        self.qualityField?.stringValue = value.status
+            ? "\(quality.label) · \(Int(value.latency.rounded())) ms"
+            : quality.label
     }
     
     public func processCallback(_ list: [Network_Process]) {
@@ -648,7 +654,8 @@ internal class Popup: PopupWrapper {
     }
     
     public func resetConnectivityView() {
-        self.connectivityField?.setStatus(nil)
+        self.qualityColorView?.set(color: .systemGray)
+        self.qualityField?.stringValue = "Checking…"
     }
     
     // MARK: - Settings
@@ -824,7 +831,7 @@ internal class Popup: PopupWrapper {
         view.toolTip = title
         
         let valueWidth = "0".widthOfString(usingFont: .systemFont(ofSize: 26, weight: .light)) + 5
-        let unitWidth = "KB/s".widthOfString(usingFont: .systemFont(ofSize: 13, weight: .light)) + 5
+        let unitWidth = "MB/s".widthOfString(usingFont: .systemFont(ofSize: 13, weight: .light)) + 5
         let topPartWidth = valueWidth + unitWidth
         
         let topView: NSView = NSView(frame: NSRect(
@@ -839,7 +846,7 @@ internal class Popup: PopupWrapper {
         valueField.textColor = .textColor
         valueField.alignment = .right
         
-        let unitField = LabelField(frame: NSRect(x: valueField.frame.width, y: 4, width: unitWidth, height: 15), "KB/s")
+        let unitField = LabelField(frame: NSRect(x: valueField.frame.width, y: 4, width: unitWidth, height: 15), "MB/s")
         unitField.font = NSFont.systemFont(ofSize: 13, weight: .light)
         unitField.textColor = .labelColor
         unitField.alignment = .left

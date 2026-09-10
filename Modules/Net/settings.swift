@@ -177,16 +177,6 @@ internal class Settings: NSStackView, Settings_v, NSTextFieldDelegate {
                 selected: self.readerType
             )),
             PreferencesRow(localizedString("Network interface"), component: interfaces),
-            PreferencesRow(localizedString("Base"), component: selectView(
-                action: #selector(self.toggleBase),
-                items: SpeedBase,
-                selected: self.baseValue
-            )),
-            PreferencesRow(localizedString("Units"), component: selectView(
-                action: #selector(self.toggleSpeedUnit),
-                items: NetworkSpeedUnits,
-                selected: self.speedUnitValue
-            )),
             PreferencesRow(localizedString("Reset data usage"), component: selectView(
                 action: #selector(self.toggleUsageReset),
                 items: AppUpdateIntervals.filter({ $0.key != "Silent" }),
@@ -210,7 +200,7 @@ internal class Settings: NSStackView, Settings_v, NSTextFieldDelegate {
         }
         let section = PreferencesSection(prefs)
         section.setRowVisibility(1, newState: self.readerType == "interface")
-        section.setRowVisibility(6, newState: self.publicIPState)
+        section.setRowVisibility(4, newState: self.publicIPState)
         self.addArrangedSubview(section)
         self.section = section
         
@@ -361,7 +351,7 @@ internal class Settings: NSStackView, Settings_v, NSTextFieldDelegate {
     @objc func togglePublicIPState(_ sender: NSControl) {
         self.publicIPState = controlState(sender)
         Store.shared.set(key: "\(self.title)_publicIP", value: self.publicIPState)
-        self.section?.setRowVisibility(6, newState: self.publicIPState)
+        self.section?.setRowVisibility(4, newState: self.publicIPState)
     }
     @objc private func toggleRefreshIPInterval(_ sender: NSMenuItem) {
         guard let key = sender.representedObject as? String else { return }

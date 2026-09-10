@@ -11,29 +11,13 @@ import Cocoa
 import Kit
 import UserNotifications
 
-import CPU
-import RAM
-import Disk
 import Net
-import Battery
-import Sensors
-import GPU
-import Bluetooth
-import Clock
-import Remote
 
-let updater = Updater(github: "exelban/stats", url: "https://api.mac-stats.com/release/latest")
+// Keep the custom build on Roger's fork so an upstream Stats release never
+// replaces the network-only version.
+let updater = Updater(github: "rogerrea/stats", url: "https://api.github.com/repos/rogerrea/stats/releases/latest")
 var modules: [Module] = [
-    CPU(),
-    GPU(),
-    RAM(),
-    Disk(),
-    Sensors(),
-    Network(),
-    Battery(),
-    Bluetooth(),
-    Clock(),
-    Remote()
+    Network()
 ]
 
 @main

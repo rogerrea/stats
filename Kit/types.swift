@@ -94,13 +94,10 @@ public let SpeedBase: [KeyValue_t] = [
     KeyValue_t(key: "byte", value: "Byte", additional: DataSizeBase.byte)
 ]
 
-public let NetworkSpeedUnitAuto = "auto"
+// This network-focused build always uses megabytes per second for live rates.
+public let NetworkSpeedUnitAuto = SizeUnit.MB.key
 public let NetworkSpeedUnits: [KeyValue_t] = [
-    KeyValue_t(key: NetworkSpeedUnitAuto, value: "Auto"),
-    KeyValue_t(key: SizeUnit.KB.key, value: "KB/Kb"),
-    KeyValue_t(key: SizeUnit.MB.key, value: "MB/Mb"),
-    KeyValue_t(key: SizeUnit.GB.key, value: "GB/Gb"),
-    KeyValue_t(key: SizeUnit.TB.key, value: "TB/Tb")
+    KeyValue_t(key: SizeUnit.MB.key, value: "MB/s")
 ]
 
 public func networkSpeedUnit(from key: String) -> KeyValue_t {

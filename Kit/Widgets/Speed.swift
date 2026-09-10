@@ -75,10 +75,10 @@ public class SpeedWidget: WidgetWrapper {
     }
     
     private var base: DataSizeBase {
-        DataSizeBase(rawValue: Store.shared.string(key: "\(self.title)_base", defaultValue: "byte")) ?? .byte
+        .byte
     }
     private var speedUnit: String {
-        networkSpeedUnit(from: Store.shared.string(key: "\(self.title)_speedUnit", defaultValue: NetworkSpeedUnitAuto)).key
+        SizeUnit.MB.key
     }
     
     public init(title: String, config: NSDictionary?, preview: Bool = false) {

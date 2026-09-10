@@ -18,4 +18,21 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - run: xcodebuild -scheme Stats -destination 'platform=macOS' -configuration Release archive CODE_SIGNING_ALLOWED=NO
+      - name: Build the custom network app
+        run: |
+          xcodebuild \
+            -scheme Stats \
+            -destination 'platform=macOS' \
+            -configuration Release \
+            -archivePath "$RUNNER_TEMP/Stats.xcarchive" \
+            CODE_SIGNING_ALLOWED=NO \
+            archive
+          codesign --force --deep --sign - "$RUNNER_TEMP/Stats.xcarchive/Products/Applications/Stats.app"
+          ditto -c -k --keepParent \
+            "$RUNNER_TEMP/Stats.xcarchive/Products/Applications/Stats.app" \
+            "$RUNNER_TEMP/Stats-Network.zip"
+      - name: Save the installable app
+        uses: actions/upload-artifact@v4
+        with:
+          name: Stats-Network
+          path: ${{ runner.temp }}/Stats-Network.zip

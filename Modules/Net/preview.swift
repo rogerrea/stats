@@ -69,10 +69,10 @@ internal class Preview: PreviewWrapper {
     }
     
     private var base: DataSizeBase {
-        DataSizeBase(rawValue: Store.shared.string(key: "\(self.module.stringValue)_base", defaultValue: "byte")) ?? .byte
+        .byte
     }
     private var speedUnit: String {
-        networkSpeedUnit(from: Store.shared.string(key: "\(self.module.stringValue)_speedUnit", defaultValue: NetworkSpeedUnitAuto)).key
+        SizeUnit.MB.key
     }
     
     public init(_ module: ModuleType) {
@@ -419,7 +419,7 @@ internal class Preview: PreviewWrapper {
         unitField.font = NSFont.systemFont(ofSize: 13, weight: .light)
         unitField.textColor = .labelColor
         unitField.alignment = .left
-        unitField.stringValue = "KB/s"
+        unitField.stringValue = "MB/s"
         
         valueView.addArrangedSubview(valueField)
         valueView.addArrangedSubview(unitField)

@@ -114,6 +114,45 @@ public struct Network_Connectivity: Codable {
     var jitter: Double = 0
 }
 
+internal enum NetworkQuality {
+    case excellent
+    case fair
+    case poor
+    case offline
+
+    init(_ connection: Network_Connectivity) {
+        guard connection.status else {
+            self = .offline
+            return
+        }
+
+        if connection.latency < 80 && connection.jitter < 25 {
+            self = .excellent
+        } else if connection.latency < 200 && connection.jitter < 60 {
+            self = .fair
+        } else {
+            self = .poor
+        }
+    }
+
+    var color: NSColor {
+        switch self {
+        case .excellent: return .systemGreen
+        case .fair: return .systemYellow
+        case .poor, .offline: return .systemRed
+        }
+    }
+
+    var label: String {
+        switch self {
+        case .excellent: return "Excellent"
+        case .fair: return "Fair"
+        case .poor: return "Poor"
+        case .offline: return "Offline"
+        }
+    }
+}
+
 public struct Network_Process: Codable, Process_p {
     public var pid: Int
     public var name: String
@@ -362,8 +401,7 @@ public class Network: Module {
         self.menuBar.widgets.filter{ $0.isActive }.forEach { (w: SWidget) in
             switch w.item {
             case let widget as DotWidget:
-                let value = value.status ? SColor.secondGreen : SColor.secondRed
-                widget.setValue(value.additional as? NSColor ?? .systemGray)
+                widget.setValue(NetworkQuality(value).color)
             default: break
             }
         }

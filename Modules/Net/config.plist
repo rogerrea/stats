@@ -54,7 +54,7 @@
 		<key>state</key>
 		<dict>
 			<key>Default</key>
-			<false/>
+			<true/>
 			<key>Order</key>
 			<integer>3</integer>
 			<key>Preview</key>

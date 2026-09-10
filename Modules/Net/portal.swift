@@ -25,10 +25,10 @@ public class Portal: PortalWrapper {
     private var publicIPView: NSView? = nil
     
     private var base: DataSizeBase {
-        DataSizeBase(rawValue: Store.shared.string(key: "\(self.name)_base", defaultValue: "byte")) ?? .byte
+        .byte
     }
     private var speedUnit: String {
-        networkSpeedUnit(from: Store.shared.string(key: "\(self.name)_speedUnit", defaultValue: NetworkSpeedUnitAuto)).key
+        SizeUnit.MB.key
     }
     private var reverseOrderState: Bool {
         Store.shared.bool(key: "\(self.name)_reverseOrder", defaultValue: false)
